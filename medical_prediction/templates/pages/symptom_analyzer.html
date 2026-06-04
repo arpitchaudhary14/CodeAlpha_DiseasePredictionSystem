@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Symptom Analyzer - MediSense{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="margin-bottom: 2rem;">
+    <div>
+        <h2 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.8rem;" class="text-gradient">{{ title }}</h2>
+        <p style="color: var(--text-muted); margin: 0; font-size: 1rem;">{{ description }}</p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary" style="text-decoration: none;">&larr; Back to Dashboard</a>
+</div>
+
+<div class="grid-2">
+    <!-- Input Form -->
+    <div class="card" style="margin-bottom: 0;">
+        <h3 class="card-title" style="margin-bottom: 1.5rem;">Symptom Details</h3>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">
+                            {{ field.errors|striptags }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div style="margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 1rem;">
+                    Analyze Symptoms
+                </button>
+            </div>
+            <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
+                <i class="fas fa-shield-alt"></i> Your data is processed securely via Google Gemini LLM.
+            </p>
+        </form>
+    </div>
+
+    <!-- AI Output Panel -->
+    <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column;">
+        <h3 class="card-title" style="margin-bottom: 1.5rem;">AI Analysis Report</h3>
+        
+        {% if result %}
+            <div style="flex-grow: 1; overflow-y: auto; background: var(--surface-hover); border-radius: var(--radius-md); padding: 1.5rem; border: 1px solid var(--border);">
+                <!-- The markdown is rendered as safe HTML from the view -->
+                <div style="line-height: 1.6; font-size: 0.95rem; color: var(--text-main);" class="ai-response-content">
+                    {{ result|safe }}
+                </div>
+            </div>
+            <style>
+                /* Style the markdown output natively */
+                .ai-response-content h3 { color: var(--primary); margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem; }
+                .ai-response-content h3:first-child { margin-top: 0; }
+                .ai-response-content ul { padding-left: 1.5rem; margin-bottom: 1rem; }
+                .ai-response-content li { margin-bottom: 0.4rem; }
+                .ai-response-content blockquote { border-left: 4px solid var(--warning); background: rgba(245, 158, 11, 0.1); padding: 1rem; margin: 0 0 1.5rem 0; border-radius: 4px; }
+                .ai-response-content p { margin-bottom: 1rem; }
+            </style>
+        {% else %}
+            <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text-muted); background: var(--surface-hover); border-radius: var(--radius-md); border: 1px dashed var(--border); padding: 2rem;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; opacity: 0.5;">
+                    <path d="M12 2v20"></path>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                <h4 style="margin: 0 0 0.5rem 0; color: var(--text-main);">Awaiting Symptoms</h4>
+                <p style="margin: 0; font-size: 0.9rem; max-width: 300px;">Fill out the form on the left with your symptom details to generate an AI assessment.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

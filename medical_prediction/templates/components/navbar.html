@@ -1,0 +1,82 @@
+{% load static %}
+<nav class="navbar">
+    <a href="{% url 'landing' %}" class="navbar-brand" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+        <div style="background: white; border-radius: 8px; padding: 3px; display: flex; align-items: center; justify-content: center; height: 35px; width: 35px; box-shadow: 0 0 10px rgba(6, 182, 212, 0.4); overflow: hidden;">
+            <img src="{% static 'img/logo.jpg' %}" alt="MediSense Logo" style="height: 100%; width: 100%; object-fit: contain;">
+        </div>
+        <span style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em;">MediSense</span>
+    </a>
+    
+    <div class="menu-toggle" id="mobile-menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+    </div>
+    
+    <ul class="navbar-nav" id="nav-links" style="gap: 1.5rem; font-size: 0.85rem;">
+        <li><a href="{% url 'landing' %}" class="nav-link" style="color: var(--text-main); font-weight: 600;">Home</a></li>
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
+            <li class="nav-item-dropdown">
+                <a href="javascript:void(0)" class="nav-link" style="display: flex; align-items: center; gap: 0.25rem;">
+                    AI Predictors <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="{% url 'predict_diabetes' %}"><i class="fa-solid fa-droplet" style="color: var(--primary);"></i> Diabetes</a></li>
+                    <li><a href="{% url 'predict_heart' %}"><i class="fa-solid fa-heart-pulse" style="color: var(--danger);"></i> Heart Disease</a></li>
+                    <li><a href="{% url 'predict_kidney' %}"><i class="fa-solid fa-vial" style="color: var(--warning);"></i> Kidney</a></li>
+                    <li><a href="{% url 'predict_liver' %}"><i class="fa-solid fa-capsules" style="color: var(--success);"></i> Liver</a></li>
+                    <li><a href="{% url 'predict_breast_cancer' %}"><i class="fa-solid fa-dna" style="color: #EC4899;"></i> Breast Cancer</a></li>
+                    <li><a href="{% url 'symptom_analyzer' %}"><i class="fa-solid fa-stethoscope" style="color: #8B5CF6;"></i> Symptom Analyzer</a></li>
+                    <li><hr style="border-color: rgba(255,255,255,0.05); margin: 0.5rem 0;"></li>
+                    <li><span style="display: block; padding: 0.75rem 1.5rem; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Coming Soon</span></li>
+                    <li><a href="javascript:void(0)" style="opacity: 0.5; pointer-events: none;"><i class="fa-solid fa-lungs"></i> Asthma Risk</a></li>
+                    <li><a href="javascript:void(0)" style="opacity: 0.5; pointer-events: none;"><i class="fa-solid fa-virus"></i> COVID-19 Severity</a></li>
+                    <li><a href="javascript:void(0)" style="opacity: 0.5; pointer-events: none;"><i class="fa-solid fa-brain"></i> Alzheimer's</a></li>
+                </ul>
+            </li>
+            <li><a href="{% url 'document_analyzer' %}" class="nav-link">Document AI</a></li>
+            <li><a href="{% url 'analytics' %}" class="nav-link">Analytics</a></li>
+            <li><a href="{% url 'history' %}" class="nav-link">History</a></li>
+            <li><a href="{% url 'contact' %}" class="nav-link">Contact Us</a></li>
+            <li>
+                <a href="{% url 'profile' %}" class="nav-link" style="display: flex; align-items: center; gap: 0.5rem;">
+                    {% if user.profile and user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
+                    {% else %}
+                        <div style="width: 24px; height: 24px; background: #8B5CF6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: white;">
+                            {{ user.username|make_list|first|upper|default:"U" }}
+                        </div>
+                    {% endif %}
+                    {{ user.username|default:"Profile" }}
+                </a>
+            </li>
+            <li>
+                <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 0.3rem 0.8rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                        Logout
+                    </button>
+                </form>
+            </li>
+        {% else %}
+            <li><a href="{% url 'contact' %}" class="nav-link">Contact Us</a></li>
+            <li><a href="{% url 'login' %}" class="nav-link">Login</a></li>
+            <li><a href="{% url 'register' %}" style="background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 0.3rem 0.8rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">Get Started</a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+
+        if(mobileMenu && navLinks) {
+            mobileMenu.addEventListener('click', function() {
+                mobileMenu.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+        }
+    });
+</script>

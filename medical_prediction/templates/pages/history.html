@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Prediction History - MediSense{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="animation: fadeIn 0.4s ease-out; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h1 style="margin: 0; color: var(--text-main); font-size: 2rem;">
+            <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary); margin-right: 0.5rem;"></i> Prediction History
+        </h1>
+    </div>
+    <div style="display: flex; gap: 1rem;">
+        {% if history %}
+        <form method="POST" action="{% url 'delete_all_history' %}" onsubmit="return confirm('Are you sure you want to delete ALL your history?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger-outline">Clear All</button>
+        </form>
+        {% endif %}
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left" style="margin-right: 0.5rem;"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="card" style="animation: fadeIn 0.5s ease-out;">
+    <form method="GET" action="{% url 'history' %}" style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
+        <i class="fa-solid fa-filter" style="color: var(--text-muted);"></i>
+        <select name="model" class="form-control" style="width: 250px;">
+            <option value="" {% if not current_filter %}selected{% endif %}>All Models</option>
+            <option value="diabetes" {% if current_filter == 'diabetes' %}selected{% endif %}>Diabetes Model</option>
+            <option value="heart" {% if current_filter == 'heart' %}selected{% endif %}>Heart Disease Model</option>
+            <option value="kidney" {% if current_filter == 'kidney' %}selected{% endif %}>Kidney Disease Model</option>
+            <option value="liver" {% if current_filter == 'liver' %}selected{% endif %}>Liver Disease Model</option>
+            <option value="breast_cancer" {% if current_filter == 'breast_cancer' %}selected{% endif %}>Breast Cancer Model</option>
+        </select>
+        <button type="submit" class="btn btn-secondary">Apply Filter</button>
+    </form>
+
+    {% if history %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%;">
+                <tr>
+                    <th>Model Used</th>
+                    <th>Prediction Outcome</th>
+                    <th>AI Confidence</th>
+                    <th>Timestamp</th>
+                    <th>Action</th>
+                </tr>
+                {% for record in history %}
+                <tr>
+                    <td style="font-weight: 500; font-size: 1.05rem;">
+                        {% if record.disease == 'diabetes' %}<i class="fa-solid fa-droplet" style="color: var(--primary); width: 20px;"></i> Diabetes{% endif %}
+                        {% if record.disease == 'heart' %}<i class="fa-solid fa-heart-pulse" style="color: var(--primary); width: 20px;"></i> Heart Disease{% endif %}
+                        {% if record.disease == 'kidney' %}<i class="fa-solid fa-vial" style="color: var(--primary); width: 20px;"></i> Kidney Disease{% endif %}
+                        {% if record.disease == 'liver' %}<i class="fa-solid fa-capsules" style="color: var(--primary); width: 20px;"></i> Liver Disease{% endif %}
+                        {% if record.disease == 'breast_cancer' %}<i class="fa-solid fa-dna" style="color: var(--primary); width: 20px;"></i> Breast Cancer{% endif %}
+                    </td>
+                    <td>
+                        {% if record.prediction == 1 or record.label == 'Malignant' or record.prediction == 0 and record.label != 'Low Risk' and record.label != 'Benign' %}
+                            <span class="badge badge-danger">{{ record.label }}</span>
+                        {% else %}
+                            <span class="badge badge-success">{{ record.label }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 60px; height: 6px; background-color: #E5E7EB; border-radius: 3px; overflow: hidden;">
+                                <div style="height: 100%; width: {% widthratio record.probability 1 100 %}%; background-color: var(--primary);"></div>
+                            </div>
+                            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ record.probability|floatformat:4 }}</span>
+                        </div>
+                    </td>
+                    <td style="color: var(--text-muted); font-size: 0.9em;">
+                        <i class="fa-regular fa-calendar" style="margin-right: 0.25rem;"></i> {{ record.created_at|date:"M d, Y" }}
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'delete_history_item' record.id %}" onsubmit="return confirm('Delete this record?');" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="background:none; border:none; color: var(--danger); cursor: pointer; padding: 0.5rem; border-radius: 4px;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'" onmouseout="this.style.background='none'">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 4rem 1rem;">
+            <div style="font-size: 3rem; color: #D1D5DB; margin-bottom: 1rem;">
+                <i class="fa-solid fa-database"></i>
+            </div>
+            <h3 style="color: var(--text-main); margin-bottom: 0.5rem;">No historical records found.</h3>
+            <p style="color: var(--text-muted); max-width: 400px; margin: 0 auto;">Your predictions will appear here automatically once you run a diagnostic model.</p>
+            <a href="{% url 'dashboard' %}" class="btn btn-primary" style="margin-top: 1.5rem;">Go to Dashboard</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

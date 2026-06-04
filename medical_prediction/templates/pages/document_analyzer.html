@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Document Intelligence - MediSense{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="margin-bottom: 2rem;">
+    <div>
+        <h2 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.8rem;" class="text-gradient">{{ title }}</h2>
+        <p style="color: var(--text-muted); margin: 0; font-size: 1rem;">{{ description }}</p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary" style="text-decoration: none;">&larr; Back to Dashboard</a>
+</div>
+
+<div class="grid-2">
+    <!-- Input Form -->
+    <div class="card" style="margin-bottom: 0;">
+        <h3 class="card-title" style="margin-bottom: 1.5rem;">Upload Document</h3>
+        
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="{{ field.id_for_label }}" style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-main);">{{ field.label }}</label>
+                    
+                    {% if field.name == 'document_file' %}
+                        <!-- Custom File Upload Styling -->
+                        <div style="border: 2px dashed var(--border); border-radius: var(--radius-md); padding: 2rem; text-align: center; background: var(--surface-hover); transition: all 0.3s ease; position: relative;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+                            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                            <p style="margin: 0 0 1rem 0; color: var(--text-muted);">Drag and drop or click to upload</p>
+                            <p style="margin: 0; font-size: 0.8rem; color: #64748b;">Supported: PDF, TXT, PNG, JPEG</p>
+                            {{ field }}
+                            <style>
+                                /* Hide the ugly default file input and stretch it over the dashed box */
+                                input[type="file"] {
+                                    position: absolute;
+                                    top: 0; left: 0; width: 100%; height: 100%;
+                                    opacity: 0; cursor: pointer;
+                                }
+                            </style>
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                    
+                    {% if field.errors %}
+                        <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">
+                            {{ field.errors|striptags }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div style="margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 1rem;">
+                    <i class="fa-solid fa-microchip" style="margin-right: 0.5rem;"></i> Analyze Document
+                </button>
+            </div>
+            <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
+                <i class="fas fa-shield-alt"></i> Your files are processed securely in memory and are <strong>not</strong> permanently stored on our servers.
+            </p>
+        </form>
+    </div>
+
+    <!-- AI Output Panel -->
+    <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column;">
+        <h3 class="card-title" style="margin-bottom: 1.5rem;">AI Interpretation</h3>
+        
+        {% if result %}
+            <div style="flex-grow: 1; overflow-y: auto; background: var(--surface-hover); border-radius: var(--radius-md); padding: 1.5rem; border: 1px solid var(--border);">
+                <!-- The markdown is rendered as safe HTML from the view -->
+                <div style="line-height: 1.6; font-size: 0.95rem; color: var(--text-main);" class="ai-response-content">
+                    {{ result|safe }}
+                </div>
+            </div>
+            <style>
+                .ai-response-content h3 { color: var(--primary); margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem; }
+                .ai-response-content h3:first-child { margin-top: 0; }
+                .ai-response-content ul { padding-left: 1.5rem; margin-bottom: 1rem; }
+                .ai-response-content li { margin-bottom: 0.4rem; }
+                .ai-response-content blockquote { border-left: 4px solid var(--warning); background: rgba(245, 158, 11, 0.1); padding: 1rem; margin: 0 0 1.5rem 0; border-radius: 4px; }
+                .ai-response-content p { margin-bottom: 1rem; }
+            </style>
+        {% else %}
+            <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text-muted); background: var(--surface-hover); border-radius: var(--radius-md); border: 1px dashed var(--border); padding: 2rem;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; opacity: 0.5;">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <h4 style="margin: 0 0 0.5rem 0; color: var(--text-main);">Awaiting Document</h4>
+                <p style="margin: 0; font-size: 0.9rem; max-width: 300px;">Upload a medical report, lab result, or prescription to instantly extract insights and explanations.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - MediSense{% endblock %}
+
+{% block content %}
+<div style="max-width: 450px; margin: 4rem auto; animation: fadeIn 0.4s ease-out;">
+    <div class="card" style="padding: 3rem 2rem;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">
+                <i class="fa-solid fa-user-doctor"></i>
+            </div>
+            <h2 class="card-title" style="margin-bottom: 0.5rem;">Welcome Back</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Sign in to access your dashboard</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div style="position: relative;">
+                    <i class="fa-solid fa-user" style="position: absolute; left: 1rem; top: 1rem; color: var(--text-muted);"></i>
+                    <input type="text" id="username" name="username" class="form-control" style="padding-left: 2.5rem;" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="password">Password</label>
+                    <a href="{% url 'password_reset' %}" style="font-size: 0.85rem; color: var(--primary); text-decoration: none;">Forgot password?</a>
+                </div>
+                <div style="position: relative;">
+                    <i class="fa-solid fa-lock" style="position: absolute; left: 1rem; top: 1rem; color: var(--text-muted);"></i>
+                    <input type="password" id="password" name="password" class="form-control" style="padding-left: 2.5rem;" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.875rem;">
+                Sign In <i class="fa-solid fa-arrow-right-to-bracket" style="margin-left: 0.5rem;"></i>
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #E5E7EB;">
+            <p style="font-size: 0.95rem; color: var(--text-muted);">
+                Don't have an account? <a href="{% url 'register' %}" style="color: var(--primary); font-weight: 600; text-decoration: none;">Create one now</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+# medical_prediction/ml/feature_meta.py
+
+# Mapping for all features to human-readable labels, defaults, and choices (if applicable)
+# Format: 'RawFeatureName': {'label': 'Human Readable Label', 'default': value, 'choices': [(val, label), ...]}
+
+FEATURE_META = {
+    # --- Diabetes Features ---
+    'HighBP': {'label': 'High Blood Pressure', 'default': 0, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'HighChol': {'label': 'High Cholesterol', 'default': 0, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'CholCheck': {'label': 'Cholesterol Check in 5 Years', 'default': 1, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'BMI': {'label': 'Body Mass Index (BMI)', 'default': 25.0, 'min': 10.0, 'max': 99.0},
+    'Smoker': {'label': 'Have you smoked 100+ cigarettes in your life?', 'default': 0, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'Stroke': {'label': 'History of Stroke', 'default': 0, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'HeartDiseaseorAttack': {'label': 'Coronary Heart Disease or MI', 'default': 0, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'PhysActivity': {'label': 'Physical Activity in past 30 days', 'default': 1, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'Fruits': {'label': 'Consume Fruit 1+ times per day', 'default': 1, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'Veggies': {'label': 'Consume Vegetables 1+ times per day', 'default': 1, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'HvyAlcoholConsump': {'label': 'Heavy Alcohol Consumption', 'default': 0, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'AnyHealthcare': {'label': 'Have any healthcare coverage', 'default': 1, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'NoDocbcCost': {'label': 'Could not see doctor because of cost', 'default': 0, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'GenHlth': {'label': 'General Health (1=Excellent, 5=Poor)', 'default': 3, 'choices': [(1, '1 - Excellent'), (2, '2 - Very Good'), (3, '3 - Good'), (4, '4 - Fair'), (5, '5 - Poor')]},
+    'MentHlth': {'label': 'Days of Poor Mental Health (0-30)', 'default': 0, 'min': 0, 'max': 30},
+    'PhysHlth': {'label': 'Days of Poor Physical Health (0-30)', 'default': 0, 'min': 0, 'max': 30},
+    'DiffWalk': {'label': 'Difficulty Walking or Climbing Stairs', 'default': 0, 'choices': [(0, 'No'), (1, 'Yes')]},
+    'Sex': {'label': 'Biological Sex', 'default': 0, 'choices': [(0, 'Female'), (1, 'Male')]},
+    'Age': {'label': 'Age Category (1=18-24, 13=80+)', 'default': 7, 'choices': [(i, str(i)) for i in range(1, 14)]},
+    'Education': {'label': 'Education Level (1=Never attended, 6=College grad)', 'default': 4, 'choices': [(i, str(i)) for i in range(1, 7)]},
+    'Income': {'label': 'Income Category (1=<$10k, 8=>=$75k)', 'default': 5, 'choices': [(i, str(i)) for i in range(1, 9)]},
+
+    # --- Heart Features (Some overlap with Diabetes) ---
+    'State': {'label': 'State of Residence', 'default': 'California'},
+    'GeneralHealth': {'label': 'General Health', 'default': 'Good', 'choices': [('Excellent', 'Excellent'), ('Very good', 'Very Good'), ('Good', 'Good'), ('Fair', 'Fair'), ('Poor', 'Poor')]},
+    'PhysicalHealthDays': {'label': 'Poor Physical Health Days (past 30 days)', 'default': 0, 'min': 0, 'max': 30},
+    'MentalHealthDays': {'label': 'Poor Mental Health Days (past 30 days)', 'default': 0, 'min': 0, 'max': 30},
+    'LastCheckupTime': {'label': 'Time since last routine checkup', 'default': 'Within past year', 'choices': [('Within past year', 'Within past year'), ('Within past 2 years', 'Within past 2 years'), ('Within past 5 years', 'Within past 5 years'), ('5 or more years ago', '5 or more years ago')]},
+    'PhysicalActivities': {'label': 'Physical Activities in past 30 days', 'default': 'Yes', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'SleepHours': {'label': 'Average Sleep Hours per night', 'default': 7.0},
+    'RemovedTeeth': {'label': 'Number of Removed Teeth', 'default': 'None of them', 'choices': [('None of them', 'None of them'), ('1 to 5', '1 to 5'), ('6 or more, but not all', '6 or more, but not all'), ('All', 'All')]},
+    'HadAngina': {'label': 'History of Angina or Coronary Heart Disease', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'HadStroke': {'label': 'History of Stroke', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'HadAsthma': {'label': 'History of Asthma', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'HadSkinCancer': {'label': 'History of Skin Cancer', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'HadCOPD': {'label': 'History of COPD', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'HadDepressiveDisorder': {'label': 'History of Depressive Disorder', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'HadKidneyDisease': {'label': 'History of Kidney Disease', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'HadArthritis': {'label': 'History of Arthritis', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'HadDiabetes': {'label': 'History of Diabetes', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes'), ('No, pre-diabetes or borderline diabetes', 'Pre-diabetes')]},
+    'DeafOrHardOfHearing': {'label': 'Deaf or Hard of Hearing', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'BlindOrVisionDifficulty': {'label': 'Blind or Vision Difficulty', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'DifficultyConcentrating': {'label': 'Difficulty Concentrating', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'DifficultyWalking': {'label': 'Difficulty Walking', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'DifficultyDressingBathing': {'label': 'Difficulty Dressing or Bathing', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'DifficultyErrands': {'label': 'Difficulty doing errands alone', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'SmokerStatus': {'label': 'Smoking Status', 'default': 'Never smoked', 'choices': [('Never smoked', 'Never smoked'), ('Former smoker', 'Former smoker'), ('Current smoker - now smokes some days', 'Smokes some days'), ('Current smoker - now smokes every day', 'Smokes every day')]},
+    'ECigaretteUsage': {'label': 'E-Cigarette Usage', 'default': 'Never used e-cigarettes in my entire life', 'choices': [('Never used e-cigarettes in my entire life', 'Never used'), ('Not at all (right now)', 'Not currently'), ('Use them some days', 'Some days'), ('Use them every day', 'Every day')]},
+    'ChestScan': {'label': 'Had Chest Scan (CT/MRI)', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'RaceEthnicityCategory': {'label': 'Race/Ethnicity', 'default': 'White only, Non-Hispanic', 'choices': [('White only, Non-Hispanic', 'White'), ('Black only, Non-Hispanic', 'Black'), ('Hispanic', 'Hispanic'), ('Other race only, Non-Hispanic', 'Other')]},
+    'AgeCategory': {'label': 'Age Category', 'default': 'Age 40 to 44', 'choices': [('Age 18 to 24', '18 to 24'), ('Age 25 to 29', '25 to 29'), ('Age 30 to 34', '30 to 34'), ('Age 35 to 39', '35 to 39'), ('Age 40 to 44', '40 to 44'), ('Age 45 to 49', '45 to 49'), ('Age 50 to 54', '50 to 54'), ('Age 55 to 59', '55 to 59'), ('Age 60 to 64', '60 to 64'), ('Age 65 to 69', '65 to 69'), ('Age 70 to 74', '70 to 74'), ('Age 75 to 79', '75 to 79'), ('Age 80 or older', '80 or older')]},
+    'HeightInMeters': {'label': 'Height (in Meters)', 'default': 1.70, 'min': 0.5, 'max': 3.0},
+    'WeightInKilograms': {'label': 'Weight (in Kilograms)', 'default': 70.0, 'min': 20.0, 'max': 300.0},
+    'AlcoholDrinkers': {'label': 'Alcohol Drinker', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'HIVTesting': {'label': 'Ever Tested for HIV', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'FluVaxLast12': {'label': 'Flu Vaccine in past 12 months', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'PneumoVaxEver': {'label': 'Pneumonia Vaccine Ever', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'TetanusLast10Tdap': {'label': 'Tetanus Shot in past 10 years', 'default': 'No, did not receive any tetanus shot in the past 10 years', 'choices': [('No, did not receive any tetanus shot in the past 10 years', 'No'), ('Yes, received tetanus shot but not sure what type', 'Yes, unsure type'), ('Yes, received Tdap', 'Yes, Tdap')]},
+    'HighRiskLastYear': {'label': 'High Risk for HIV (last year)', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+    'CovidPos': {'label': 'Ever Tested Positive for COVID-19', 'default': 'No', 'choices': [('No', 'No'), ('Yes', 'Yes')]},
+
+    # --- Liver Features ---
+    'Age of the patient': {'label': 'Age', 'default': 45, 'min': 1, 'max': 120},
+    'Gender of the patient': {'label': 'Gender', 'default': 1, 'choices': [(1, 'Male'), (0, 'Female')]},
+    'Total Bilirubin': {'label': 'Total Bilirubin (mg/dL)', 'default': 1.0, 'min': 0.1, 'max': 50.0},
+    'Direct Bilirubin': {'label': 'Direct Bilirubin (mg/dL)', 'default': 0.3, 'min': 0.1, 'max': 30.0},
+    'Alkphos Alkaline Phosphotase': {'label': 'Alkaline Phosphatase (IU/L)', 'default': 100.0, 'min': 10.0, 'max': 2500.0},
+    'Sgpt Alamine Aminotransferase': {'label': 'SGPT / ALT (IU/L)', 'default': 30.0, 'min': 5.0, 'max': 2500.0},
+    'Sgot Aspartate Aminotransferase': {'label': 'SGOT / AST (IU/L)', 'default': 30.0, 'min': 5.0, 'max': 2500.0},
+    'Total Protiens': {'label': 'Total Proteins (g/dL)', 'default': 6.5, 'min': 2.0, 'max': 12.0},
+    'ALB Albumin': {'label': 'Albumin (g/dL)', 'default': 3.5, 'min': 1.0, 'max': 7.0},
+    'A/G Ratio Albumin and Globulin Ratio': {'label': 'A/G Ratio', 'default': 1.0, 'min': 0.1, 'max': 5.0},
+
+    # --- Kidney Features (Abbreviated, default mapping to mean/normal) ---
+    'Blood pressure (mm/Hg)': {'label': 'Blood Pressure (mm/Hg)', 'default': 120.0, 'min': 50.0, 'max': 250.0},
+    'Specific gravity of urine': {'label': 'Specific Gravity of Urine', 'default': 1.015, 'choices': [(1.005, '1.005'), (1.010, '1.010'), (1.015, '1.015'), (1.020, '1.020'), (1.025, '1.025')]},
+    'Albumin in urine': {'label': 'Albumin in Urine (0-5)', 'default': 0, 'choices': [(i, str(i)) for i in range(6)]},
+    'Sugar in urine': {'label': 'Sugar in Urine (0-5)', 'default': 0, 'choices': [(i, str(i)) for i in range(6)]},
+    'Red blood cells in urine': {'label': 'Red Blood Cells in Urine', 'default': 'normal', 'choices': [('normal', 'Normal'), ('abnormal', 'Abnormal')]},
+    'Pus cells in urine': {'label': 'Pus Cells in Urine', 'default': 'normal', 'choices': [('normal', 'Normal'), ('abnormal', 'Abnormal')]},
+    'Pus cell clumps in urine': {'label': 'Pus Cell Clumps in Urine', 'default': 'notpresent', 'choices': [('notpresent', 'Not Present'), ('present', 'Present')]},
+    'Bacteria in urine': {'label': 'Bacteria in Urine', 'default': 'notpresent', 'choices': [('notpresent', 'Not Present'), ('present', 'Present')]},
+    'Random blood glucose level (mg/dl)': {'label': 'Random Blood Glucose (mg/dl)', 'default': 100.0, 'min': 20.0, 'max': 800.0},
+    'Blood urea (mg/dl)': {'label': 'Blood Urea (mg/dl)', 'default': 30.0, 'min': 2.0, 'max': 400.0},
+    'Serum creatinine (mg/dl)': {'label': 'Serum Creatinine (mg/dl)', 'default': 1.0, 'min': 0.1, 'max': 30.0},
+    'Sodium level (mEq/L)': {'label': 'Sodium Level (mEq/L)', 'default': 140.0, 'min': 100.0, 'max': 170.0},
+    'Potassium level (mEq/L)': {'label': 'Potassium Level (mEq/L)', 'default': 4.5, 'min': 2.0, 'max': 8.0},
+    'Hemoglobin level (gms)': {'label': 'Hemoglobin Level (gms)', 'default': 14.0, 'min': 3.0, 'max': 22.0},
+    'Packed cell volume (%)': {'label': 'Packed Cell Volume (PCV %)', 'default': 40.0, 'min': 10.0, 'max': 70.0},
+    'White blood cell count (cells/cumm)': {'label': 'WBC Count (cells/cumm)', 'default': 8000.0, 'min': 1000.0, 'max': 50000.0},
+    'Red blood cell count (millions/cumm)': {'label': 'RBC Count (millions/cumm)', 'default': 5.0, 'min': 1.0, 'max': 10.0},
+    'Hypertension (yes/no)': {'label': 'Hypertension', 'default': 'no', 'choices': [('no', 'No'), ('yes', 'Yes')]},
+    'Diabetes mellitus (yes/no)': {'label': 'Diabetes Mellitus', 'default': 'no', 'choices': [('no', 'No'), ('yes', 'Yes')]},
+    'Coronary artery disease (yes/no)': {'label': 'Coronary Artery Disease', 'default': 'no', 'choices': [('no', 'No'), ('yes', 'Yes')]},
+    'Appetite (good/poor)': {'label': 'Appetite', 'default': 'good', 'choices': [('good', 'Good'), ('poor', 'Poor')]},
+    'Pedal edema (yes/no)': {'label': 'Pedal Edema', 'default': 'no', 'choices': [('no', 'No'), ('yes', 'Yes')]},
+    'Anemia (yes/no)': {'label': 'Anemia', 'default': 'no', 'choices': [('no', 'No'), ('yes', 'Yes')]},
+    'Estimated Glomerular Filtration Rate (eGFR)': {'label': 'eGFR', 'default': 90.0, 'min': 0.0, 'max': 200.0},
+    'Urine protein-to-creatinine ratio': {'label': 'Urine Protein-to-Creatinine Ratio', 'default': 0.1, 'min': 0.0, 'max': 20.0},
+    'Urine output (ml/day)': {'label': 'Urine Output (ml/day)', 'default': 1500.0, 'min': 0.0, 'max': 10000.0},
+    'Serum albumin level': {'label': 'Serum Albumin (g/dL)', 'default': 4.0, 'min': 1.0, 'max': 7.0},
+    'Cholesterol level': {'label': 'Cholesterol Level (mg/dL)', 'default': 180.0, 'min': 50.0, 'max': 800.0},
+    'Parathyroid hormone (PTH) level': {'label': 'PTH Level (pg/mL)', 'default': 30.0, 'min': 0.0, 'max': 2500.0},
+    'Serum calcium level': {'label': 'Serum Calcium (mg/dL)', 'default': 9.5, 'min': 3.0, 'max': 15.0},
+    'Serum phosphate level': {'label': 'Serum Phosphate (mg/dL)', 'default': 3.5, 'min': 1.0, 'max': 15.0},
+    'Family history of chronic kidney disease': {'label': 'Family History of CKD', 'default': 'no', 'choices': [('no', 'No'), ('yes', 'Yes')]},
+    'Smoking status': {'label': 'Smoking Status', 'default': 'no', 'choices': [('no', 'No'), ('yes', 'Yes')]},
+    'Body Mass Index (BMI)': {'label': 'Body Mass Index (BMI)', 'default': 25.0, 'min': 10.0, 'max': 99.0},
+    'Physical activity level': {'label': 'Physical Activity Level', 'default': 'moderate', 'choices': [('low', 'Low'), ('moderate', 'Moderate'), ('high', 'High')]},
+    'Duration of diabetes mellitus (years)': {'label': 'Duration of Diabetes (years)', 'default': 0, 'min': 0, 'max': 80},
+    'Duration of hypertension (years)': {'label': 'Duration of Hypertension (years)', 'default': 0, 'min': 0, 'max': 80},
+    'Cystatin C level': {'label': 'Cystatin C (mg/L)', 'default': 0.8, 'min': 0.1, 'max': 10.0},
+    'Urinary sediment microscopy results': {'label': 'Urinary Sediment Microscopy', 'default': 'normal', 'choices': [('normal', 'Normal'), ('abnormal', 'Abnormal')]},
+    'C-reactive protein (CRP) level': {'label': 'CRP Level (mg/L)', 'default': 1.0, 'min': 0.0, 'max': 500.0},
+    'Interleukin-6 (IL-6) level': {'label': 'IL-6 Level (pg/mL)', 'default': 2.0, 'min': 0.0, 'max': 500.0},
+}
+
+# Fallback generator for Breast Cancer and unmapped features
+def get_feature_meta(feature_name):
+    if feature_name in FEATURE_META:
+        return FEATURE_META[feature_name]
+    
+    # Fallback for breast cancer and others
+    label = feature_name.replace('_', ' ').title()
+    if 'mean' in label.lower() or 'error' in label.lower() or 'worst' in label.lower():
+        return {'label': label, 'default': 0.0}
+    
+    return {'label': label, 'default': 0}

@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - MediSense{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1 style="margin: 0; font-size: 2rem; letter-spacing: -0.02em;">Welcome back, <span class="text-gradient">{{ user.username }}</span></h1>
+        <p style="color: var(--text-muted); margin: 0.5rem 0 0 0;">Here is what's happening with your predictions today.</p>
+    </div>
+    <a href="{% url 'history' %}" class="btn btn-secondary">
+        <i class="fa-solid fa-list" style="margin-right: 0.5rem;"></i> View History
+    </a>
+</div>
+
+<div class="card" style="margin-bottom: 2rem; background: var(--surface);">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;">
+        <i class="fa-solid fa-bolt" style="color: var(--primary); font-size: 1.5rem;"></i>
+        <h2 style="margin: 0;">Quick Predictors</h2>
+    </div>
+    <div class="grid-3">
+        {% include 'components/disease_card.html' with title="Diabetes" desc="Predict diabetes risk using health indicators." url_name="predict_diabetes" icon="fa-droplet" color="text-gradient" %}
+        {% include 'components/disease_card.html' with title="Heart Disease" desc="Analyze cardiovascular risk factors." url_name="predict_heart" icon="fa-heart-pulse" color="text-gradient" %}
+        {% include 'components/disease_card.html' with title="Kidney Disease" desc="Early detection of chronic kidney conditions." url_name="predict_kidney" icon="fa-vial" color="text-gradient" %}
+        {% include 'components/disease_card.html' with title="Liver Disease" desc="Assess liver health parameters." url_name="predict_liver" icon="fa-capsules" color="text-gradient" %}
+        {% include 'components/disease_card.html' with title="Breast Cancer" desc="Analyze cellular features for malignancy." url_name="predict_breast_cancer" icon="fa-dna" color="text-gradient" %}
+        {% include 'components/disease_card.html' with title="Symptom Analyzer" desc="AI-powered medical assessment." url_name="symptom_analyzer" icon="fa-stethoscope" color="text-gradient" %}
+    </div>
+</div>
+
+<div class="grid-3">
+    <div class="card" style="grid-column: span 2;">
+        <h2 style="margin-bottom: 1.5rem;"><i class="fa-solid fa-clock-rotate-left" style="color: var(--primary); margin-right: 0.5rem;"></i> Recent Activity</h2>
+        {% if recent_history %}
+            <div style="overflow-x: auto;">
+                <table>
+                    <tr>
+                        <th>Disease</th>
+                        <th>Outcome</th>
+                        <th>Confidence</th>
+                        <th>Date</th>
+                    </tr>
+                    {% for record in recent_history %}
+                    <tr>
+                        <td style="font-weight: 500;">
+                            {% if record.disease == 'diabetes' %}<i class="fa-solid fa-droplet" style="color: var(--primary); width: 20px;"></i> Diabetes{% endif %}
+                            {% if record.disease == 'heart' %}<i class="fa-solid fa-heart-pulse" style="color: var(--primary); width: 20px;"></i> Heart Disease{% endif %}
+                            {% if record.disease == 'kidney' %}<i class="fa-solid fa-vial" style="color: var(--primary); width: 20px;"></i> Kidney Disease{% endif %}
+                            {% if record.disease == 'liver' %}<i class="fa-solid fa-capsules" style="color: var(--primary); width: 20px;"></i> Liver Disease{% endif %}
+                            {% if record.disease == 'breast_cancer' %}<i class="fa-solid fa-dna" style="color: var(--primary); width: 20px;"></i> Breast Cancer{% endif %}
+                        </td>
+                        <td>
+                            {% if record.prediction == 1 or record.label == 'Malignant' or record.prediction == 0 and record.label != 'Low Risk' and record.label != 'Benign' %}
+                                <span class="badge badge-danger">{{ record.label }}</span>
+                            {% else %}
+                                <span class="badge badge-success">{{ record.label }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 50px; height: 6px; background-color: #E5E7EB; border-radius: 3px; overflow: hidden;">
+                                    <div style="height: 100%; width: {% widthratio record.probability 1 100 %}%; background-color: var(--primary);"></div>
+                                </div>
+                                <span style="font-size: 0.85rem; color: var(--text-muted);">{{ record.probability|floatformat:2 }}</span>
+                            </div>
+                        </td>
+                        <td style="color: var(--text-muted); font-size: 0.9em;">{{ record.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                <i class="fa-solid fa-folder-open" style="font-size: 2rem; margin-bottom: 1rem; color: #D1D5DB;"></i>
+                <p>No predictions made yet. Run your first model to see activity here.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="card" style="background: radial-gradient(circle at top right, #1e293b 0%, #0f172a 100%); border: 1px solid var(--border);">
+        <h2 style="color: var(--text-main); margin-bottom: 1.5rem;">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7; margin-right: 0.5rem; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);"></i> AI Features
+        </h2>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed var(--border);">
+                <div style="font-weight: 600; color: var(--text-main); display: flex; justify-content: space-between; align-items: center;">
+                    Health Assistant 
+                </div>
+                <div style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 1rem;">Ask AI questions about your health and predictions.</div>
+                <a href="{% url 'health_assistant' %}" class="btn btn-primary" style="width: 100%; font-size: 0.9rem;">
+                    <i class="fa-solid fa-comment-medical" style="margin-right: 0.5rem;"></i> Open Assistant
+                </a>
+            </li>
+
+            <li style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed var(--border);">
+                <div style="font-weight: 600; color: var(--text-main); display: flex; justify-content: space-between; align-items: center;">
+                    Symptom Analyzer 
+                </div>
+                <div style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 1rem;">AI-powered symptom evaluation.</div>
+                <a href="{% url 'symptom_analyzer' %}" class="btn btn-primary" style="width: 100%; font-size: 0.9rem;">
+                    <i class="fa-solid fa-stethoscope" style="margin-right: 0.5rem;"></i> Analyze Symptoms
+                </a>
+            </li>
+
+            <li style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed var(--border);">
+                <div style="font-weight: 600; color: var(--text-main); display: flex; justify-content: space-between; align-items: center;">
+                    Document Intelligence 
+                </div>
+                <div style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 1rem;">Upload reports, labs, & prescriptions.</div>
+                <a href="{% url 'document_analyzer' %}" class="btn btn-primary" style="width: 100%; font-size: 0.9rem;">
+                    <i class="fa-solid fa-file-medical" style="margin-right: 0.5rem;"></i> Analyze Document
+                </a>
+            </li>
+
+            <li>
+                <div style="font-weight: 600; color: var(--text-main); display: flex; justify-content: space-between; align-items: center;">
+                    Prescription Reader
+                </div>
+                <div style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 1rem;">Extract text from handwritten prescriptions.</div>
+                <a href="{% url 'document_analyzer' %}?type=prescription" class="btn btn-primary" style="width: 100%; font-size: 0.9rem;">
+                    <i class="fa-solid fa-prescription-bottle-medical" style="margin-right: 0.5rem;"></i> Read Prescription
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

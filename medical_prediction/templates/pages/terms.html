@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms & Conditions - MediSense{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="margin-bottom: 2rem;">
+    <div>
+        <h1 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 2rem;">Terms & Conditions</h1>
+        <p style="color: var(--text-muted); margin: 0; font-size: 1rem;">Please read these terms carefully.</p>
+    </div>
+</div>
+
+<div class="card" style="line-height: 1.8; color: var(--text-muted);">
+    <h3 style="color: var(--text-main);">1. Not a Substitute for Medical Advice</h3>
+    <p>MediSense provides AI-powered insights, predictions, and document analysis. <strong>Our services do not constitute a medical diagnosis, treatment, or professional medical advice.</strong> You should always consult with a qualified healthcare professional before making any health decisions.</p>
+    
+    <h3 style="color: var(--text-main);">2. Accuracy of AI Output</h3>
+    <p>While we strive for high accuracy using advanced machine learning and LLMs, AI models can hallucinate or produce incorrect information. You agree not to hold MediSense liable for any errors or omissions in the analysis.</p>
+
+    <h3 style="color: var(--text-main);">3. Acceptable Use</h3>
+    <p>You agree to use this platform only for lawful purposes. Uploading malicious files or attempting to reverse-engineer our prediction models is strictly prohibited.</p>
+</div>
+{% endblock %}

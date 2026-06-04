@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MediSense - Enterprise AI Healthcare Prediction{% endblock %}
+
+{% block content %}
+<div class="card" style="margin: 3rem auto 2rem auto; max-width: 800px; text-align: center; padding: 4rem 2rem; background: var(--glass-bg); backdrop-filter: blur(10px);">
+    <h1 style="font-size: 3.5rem; margin-bottom: 1rem; line-height: 1.2;">Predict Diseases with <span class="text-gradient">AI</span></h1>
+    <p style="font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 2rem auto; line-height: 1.6;">
+        Instantly detect Diabetes, Heart Disease, Kidney issues, Liver conditions, and Breast Cancer directly from medical data patterns with our highly accurate AI system.
+    </p>
+
+    <!-- Global Search Bar -->
+    <div style="max-width: 500px; margin: 0 auto 3rem auto; position: relative;">
+        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+        <input type="text" id="globalSearch" placeholder="Search models, features, or pages (e.g., 'Diabetes', 'Contact Us')..." class="form-control" style="padding-left: 2.5rem; border-radius: 20px;">
+        <div id="searchMessage" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; display: none;"></div>
+    </div>
+
+    <div>
+        {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="btn btn-primary" style="font-size: 1rem; padding: 0.8rem 2rem; border-radius: 8px;">
+                Go to Dashboard
+            </a>
+            <a href="{% url 'history' %}" class="btn btn-secondary" style="font-size: 1rem; padding: 0.8rem 2rem; border-radius: 8px;">
+                View History
+            </a>
+        {% else %}
+            <a href="{% url 'register' %}" class="btn btn-primary" style="font-size: 1rem; padding: 0.8rem 2rem; border-radius: 8px;">
+                Open Dashboard
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    const searchMap = {
+        'diabetes': "{% url 'predict_diabetes' %}",
+        'heart': "{% url 'predict_heart' %}",
+        'kidney': "{% url 'predict_kidney' %}",
+        'liver': "{% url 'predict_liver' %}",
+        'cancer': "{% url 'predict_breast_cancer' %}",
+        'breast cancer': "{% url 'predict_breast_cancer' %}",
+        'symptoms': "{% url 'symptom_analyzer' %}",
+        'analyzer': "{% url 'symptom_analyzer' %}",
+        'health assistant': "{% url 'health_assistant' %}",
+        'assistant': "{% url 'health_assistant' %}",
+        'document': "{% url 'document_analyzer' %}",
+        'lab': "{% url 'document_analyzer' %}",
+        'prescription': "{% url 'document_analyzer' %}",
+        'analytics': "{% url 'analytics' %}",
+        'history': "{% url 'history' %}",
+        'contact': "{% url 'contact' %}",
+        'contact us': "{% url 'contact' %}",
+        'privacy': "{% url 'privacy' %}",
+        'terms': "{% url 'terms' %}",
+        'profile': "{% url 'profile' %}",
+        'dashboard': "{% url 'dashboard' %}"
+    };
+
+    document.getElementById('globalSearch').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const query = this.value.toLowerCase().trim();
+            const msg = document.getElementById('searchMessage');
+            
+            // Check direct matches or partial matches
+            let found = false;
+            for (const [key, url] of Object.entries(searchMap)) {
+                if (query.includes(key) || key.includes(query)) {
+                    window.location.href = url;
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found && query.length > 0) {
+                msg.textContent = "No page found for '" + query + "'. Try 'Diabetes' or 'History'.";
+                msg.style.display = 'block';
+            } else {
+                msg.style.display = 'none';
+            }
+        }
+    });
+</script>
+
+<div style="max-width: 1200px; margin: 0 auto 4rem auto; padding: 0 1rem;">
+    <h2 style="text-align: center; font-size: 2rem; margin-bottom: 2.5rem; color: var(--text-main);">Comprehensive <span class="text-gradient">Diagnostic Tools</span></h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+        
+        <div class="card" style="padding: 1.5rem; margin: 0; display: flex; flex-direction: column;">
+            <div style="color: var(--primary); font-size: 1.5rem; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-droplet"></i>
+            </div>
+            <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;">Diabetes Predictor</h3>
+            <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.4;">
+                Analyze glucose, BMI, and insulin levels to detect diabetes onset with high precision.
+            </p>
+        </div>
+
+        <div class="card" style="padding: 1.5rem; margin: 0; display: flex; flex-direction: column;">
+            <div style="color: var(--danger); font-size: 1.5rem; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+            <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;">Heart Disease</h3>
+            <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.4;">
+                Assess cardiovascular risk factors including blood pressure, cholesterol, and ECG results.
+            </p>
+        </div>
+
+        <div class="card" style="padding: 1.5rem; margin: 0; display: flex; flex-direction: column;">
+            <div style="color: var(--warning); font-size: 1.5rem; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-vial"></i>
+            </div>
+            <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;">Kidney Disease</h3>
+            <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.4;">
+                Evaluate chronic kidney conditions using blood metrics and urine sample analysis.
+            </p>
+        </div>
+
+        <div class="card" style="padding: 1.5rem; margin: 0; display: flex; flex-direction: column;">
+            <div style="color: var(--success); font-size: 1.5rem; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-capsules"></i>
+            </div>
+            <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;">Liver Disease</h3>
+            <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.4;">
+                Detect hepatic abnormalities by analyzing bilirubin, proteins, and liver enzymes.
+            </p>
+        </div>
+
+        <div class="card" style="padding: 1.5rem; margin: 0; display: flex; flex-direction: column;">
+            <div style="color: #EC4899; font-size: 1.5rem; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-dna"></i>
+            </div>
+            <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;">Breast Cancer</h3>
+            <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.4;">
+                Classify tumor characteristics to predict malignancy using advanced cytology data.
+            </p>
+        </div>
+
+        <div class="card" style="padding: 1.5rem; margin: 0; border-color: rgba(139, 92, 246, 0.4); display: flex; flex-direction: column;">
+            <div style="color: #8B5CF6; font-size: 1.5rem; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-robot"></i>
+            </div>
+            <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;">AI Symptom Analyzer</h3>
+            <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.4;">
+                Describe your symptoms in plain text and let our LLM generate possible conditions.
+            </p>
+        </div>
+
+        <div class="card" style="padding: 1.5rem; margin: 0; border-color: rgba(139, 92, 246, 0.4); display: flex; flex-direction: column;">
+            <div style="color: #8B5CF6; font-size: 1.5rem; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-file-medical"></i>
+            </div>
+            <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;">Document AI</h3>
+            <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.4;">
+                Upload complex medical lab reports and get them summarized in simple language.
+            </p>
+        </div>
+
+        <div class="card" style="padding: 1.5rem; margin: 0; display: flex; flex-direction: column;">
+            <div style="color: #3B82F6; font-size: 1.5rem; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;">Real-time Analytics</h3>
+            <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.4;">
+                Track diagnostic trends, monitor model confidence, and visualize prediction history.
+            </p>
+        </div>
+
+    </div>
+    
+    <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-top: 5rem; margin-bottom: 2rem;">
+        <i class="fa-solid fa-hourglass-half" style="color: var(--text-muted); font-size: 1.5rem;"></i>
+        <h2 style="margin: 0; color: var(--text-muted); font-size: 1.8rem;">Coming Soon</h2>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; opacity: 0.6; pointer-events: none; filter: grayscale(100%);">
+        
+        <div class="card" style="padding: 1.5rem; margin: 0; display: flex; flex-direction: column;">
+            <div style="color: var(--text-main); font-size: 1.5rem; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-lungs"></i>
+            </div>
+            <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;">Asthma Risk</h3>
+            <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.4;">
+                Respiratory health and environmental factors.
+            </p>
+        </div>
+
+        <div class="card" style="padding: 1.5rem; margin: 0; display: flex; flex-direction: column;">
+            <div style="color: var(--text-main); font-size: 1.5rem; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-virus"></i>
+            </div>
+            <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;">COVID-19 Severity</h3>
+            <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.4;">
+                Predict infection severity and recovery timeline.
+            </p>
+        </div>
+
+        <div class="card" style="padding: 1.5rem; margin: 0; display: flex; flex-direction: column;">
+            <div style="color: var(--text-main); font-size: 1.5rem; margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem;">Alzheimer's Detection</h3>
+            <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem; line-height: 1.4;">
+                Early cognitive decline analysis via MRI.
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

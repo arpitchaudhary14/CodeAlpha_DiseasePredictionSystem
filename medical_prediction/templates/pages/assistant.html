@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - MediSense{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="animation: fadeIn 0.4s ease-out; margin-bottom: 2rem;">
+    <div>
+        <h1 style="margin: 0; color: var(--text-main); font-size: 2rem;">
+            <i class="fa-solid fa-comment-medical" style="color: #a855f7; margin-right: 0.5rem; text-shadow: 0 0 10px rgba(168,85,247,0.5);"></i> {{ title }}
+        </h1>
+        <p style="color: var(--text-muted); margin: 0.5rem 0 0 0;">{{ description }}</p>
+    </div>
+    <div>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left" style="margin-right: 0.5rem;"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="grid-2">
+    <!-- Form Card -->
+    <div class="card" style="animation: fadeIn 0.5s ease-out; border-color: rgba(168, 85, 247, 0.3);">
+        <h2 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.3rem;">Ask Your Question</h2>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem;">
+                    {{ field.errors|join:", " }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; background: linear-gradient(135deg, #a855f7, #6b21a8); box-shadow: 0 4px 14px rgba(168,85,247,0.4);">
+                <i class="fa-solid fa-paper-plane" style="margin-right: 0.5rem;"></i> Ask Assistant
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Card -->
+    <div class="card" style="animation: fadeIn 0.6s ease-out;">
+        <h2 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.3rem;">
+            <i class="fa-solid fa-robot" style="color: var(--primary); margin-right: 0.5rem;"></i> AI Response
+        </h2>
+        
+        {% if result %}
+            <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border); line-height: 1.7;">
+                {{ result|safe }}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <i class="fa-solid fa-comment-dots" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                <p>Type your question on the left and our AI Assistant will respond here.</p>
+                <p style="font-size: 0.85rem; opacity: 0.7;">Note: The assistant will review your recent prediction history to provide tailored context.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

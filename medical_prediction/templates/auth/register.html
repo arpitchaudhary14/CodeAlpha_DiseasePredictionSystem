@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - MediSense{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 4rem auto; animation: fadeIn 0.4s ease-out;">
+    <div class="card" style="padding: 3rem 2rem;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">
+                <i class="fa-solid fa-hospital-user"></i>
+            </div>
+            <h2 class="card-title" style="margin-bottom: 0.5rem;">Create Account</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Join MediSense to start making predictions</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <small style="color: var(--text-muted); display: block; margin-top: 0.4rem; font-size: 0.8rem;">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                <small style="color: var(--danger); display: block; margin-top: 0.4rem; font-weight: 500;"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</small>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.875rem;">
+                Register <i class="fa-solid fa-user-plus" style="margin-left: 0.5rem;"></i>
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #E5E7EB;">
+            <p style="font-size: 0.95rem; color: var(--text-muted);">
+                Already have an account? <a href="{% url 'login' %}" style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign in</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add form-control class to all inputs
+    document.querySelectorAll('input, select, textarea').forEach(function(el) {
+        if(el.type !== 'checkbox' && el.type !== 'radio') {
+            el.classList.add('form-control');
+        }
+    });
+</script>
+{% endblock %}

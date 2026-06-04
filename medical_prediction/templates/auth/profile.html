@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - MediSense{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <h1 style="margin-bottom: 0.5rem; font-size: 2rem;">Your Profile</h1>
+    <p style="color: var(--text-muted); margin-top: 0; margin-bottom: 3rem;">Manage your account settings and preferences.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 1000px;">
+    <!-- Profile Card -->
+    <div class="card" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 0;">
+        {% if profile.avatar %}
+            <div style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; margin-bottom: 1rem; border: 3px solid var(--primary);">
+                <img src="{{ profile.avatar.url }}" alt="Profile Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        {% else %}
+            <div style="width: 100px; height: 100px; background: #8B5CF6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; margin-bottom: 1rem;">
+                {{ user.username|make_list|first|upper|default:"U" }}
+            </div>
+        {% endif %}
+        
+        <h2 style="margin: 0 0 0.2rem 0; font-size: 1.4rem;">{{ user.username|title }}</h2>
+        <p style="margin: 0 0 0.5rem 0; color: var(--text-muted); font-size: 0.9rem;">{{ user.email|default:"user@example.com" }}</p>
+        <p style="margin: 0 0 1.5rem 0; color: var(--text-muted); font-size: 0.8rem;">Member since {{ user.date_joined|date:"M d, Y" }}</p>
+        
+        <form method="POST" enctype="multipart/form-data" style="margin-top: 1rem; width: 100%;">
+            {% csrf_token %}
+            <div style="margin-bottom: 1rem; text-align: left;">
+                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Upload new avatar</label>
+                {{ form.avatar }}
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Update Avatar</button>
+        </form>
+    </div>
+
+    <!-- Security Settings -->
+    <div class="card" style="margin-bottom: 0;">
+        <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.2rem;">Security Settings</h3>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem;">
+            <div>
+                <h4 style="margin: 0 0 0.3rem 0; font-size: 1rem;">Two-Factor Authentication (2FA)</h4>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Add an extra layer of security to your account</p>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h4 style="margin: 0 0 0.3rem 0; font-size: 1rem;">Password Management</h4>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Update your password regularly</p>
+            </div>
+            <a href="{% url 'password_reset' %}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem; text-decoration: none;">Change Password</a>
+        </div>
+    </div>
+</div>
+
+<!-- Danger Zone -->
+<div class="danger-zone" style="max-width: 935px; margin: 2rem auto;">
+    <div>
+        <h3 class="danger-zone-title">Danger Zone</h3>
+        <h4 style="margin: 0 0 0.3rem 0; font-size: 1rem;">Delete Account</h4>
+        <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted); max-width: 400px;">Once you delete your account, there is no going back. Please be certain.</p>
+    </div>
+    <button type="button" class="btn btn-danger-outline" style="padding: 0.6rem 1rem;" onclick="document.getElementById('deleteModal').style.display='flex'">Delete your account</button>
+</div>
+
+<!-- Delete Account Modal -->
+<div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000;">
+    <div class="card" style="width: 100%; max-width: 450px; background: var(--surface);">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+            <h3 style="margin: 0; color: var(--danger);">Are you absolutely sure?</h3>
+            <button type="button" style="background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer;" onclick="document.getElementById('deleteModal').style.display='none'"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <p style="font-size: 0.95rem; margin-bottom: 1.5rem;">This action <strong>cannot</strong> be undone. This will permanently delete your account, prediction history, and all associated data.</p>
+        
+        <p style="font-size: 0.95rem; margin-bottom: 0.5rem;">Please type <strong>{{ user.username }}</strong> to confirm.</p>
+        
+        <form method="POST" action="{% url 'delete_account' %}">
+            {% csrf_token %}
+            <input type="text" name="confirm_username" class="form-control" autocomplete="off" required style="margin-bottom: 1.5rem;">
+            <button type="submit" class="btn btn-danger" style="width: 100%; justify-content: center;">I understand the consequences, delete my account</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

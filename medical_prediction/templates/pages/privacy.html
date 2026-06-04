@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy Policy - MediSense{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="margin-bottom: 2rem;">
+    <div>
+        <h1 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 2rem;">Privacy Policy</h1>
+        <p style="color: var(--text-muted); margin: 0; font-size: 1rem;">Last Updated: Today</p>
+    </div>
+</div>
+
+<div class="card" style="line-height: 1.8; color: var(--text-muted);">
+    <h3 style="color: var(--text-main);">1. Data Collection</h3>
+    <p>At MediSense, we take your privacy seriously. We only collect the data necessary to provide you with accurate AI-driven medical insights. Your medical inputs are processed securely.</p>
+    
+    <h3 style="color: var(--text-main);">2. Data Storage & AI Processing</h3>
+    <p>When you upload documents for analysis (like PDFs or images), we process them directly in memory and securely transmit them to our AI providers (e.g., Google Gemini). <strong>We do not permanently store your raw uploaded documents on our servers.</strong> We only store the resulting text analysis in your history.</p>
+
+    <h3 style="color: var(--text-main);">3. Data Deletion</h3>
+    <p>You have full control over your data. You can delete individual prediction history items, clear all history, or permanently delete your entire account from the Profile settings at any time.</p>
+</div>
+{% endblock %}

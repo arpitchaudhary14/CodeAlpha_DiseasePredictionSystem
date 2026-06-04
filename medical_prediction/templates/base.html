@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MediSense - AI Healthcare Diagnostics{% endblock %}</title>
+    <!-- Add Favicon -->
+    <link rel="icon" type="image/jpeg" href="{% static 'img/logo.jpg' %}">
+    <!-- Add FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+    {% include 'components/navbar.html' %}
+    
+    <main class="container">
+        {% include 'components/alert.html' %}
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    {% include 'components/footer.html' %}
+
+    {% include 'components/cookie_settings.html' %}
+    
+    {% if user.is_authenticated %}
+    <form id="afk-logout-form" method="post" action="{% url 'logout' %}?next={% url 'login' %}" style="display:none;">
+        {% csrf_token %}
+    </form>
+    <script>
+        (function() {
+            // 15 minutes = 900,000 milliseconds
+            const AFK_TIMEOUT = 900000;
+            let afkTimer;
+
+            const resetTimer = () => {
+                clearTimeout(afkTimer);
+                afkTimer = setTimeout(() => {
+                    alert("Your session has expired due to 15 minutes of inactivity. You are being logged out.");
+                    document.getElementById('afk-logout-form').submit();
+                }, AFK_TIMEOUT);
+            };
+
+            // Monitor user activity
+            const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+            activityEvents.forEach(event => {
+                document.addEventListener(event, resetTimer, { passive: true });
+            });
+
+            // Start timer
+            resetTimer();
+        })();
+    </script>
+    {% endif %}
+</body>
+</html>

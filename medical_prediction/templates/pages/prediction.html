@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - MediSense{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="animation: fadeIn 0.4s ease-out;">
+    <div>
+        <h1 style="margin: 0; color: var(--text-main); font-size: 2rem;">{{ title }}</h1>
+        <p style="color: var(--text-muted); margin: 0.5rem 0 0 0; max-width: 600px;">{{ description }}</p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+        <i class="fa-solid fa-arrow-left" style="margin-right: 0.5rem;"></i> Back to Dashboard
+    </a>
+</div>
+
+{% if title == 'Breast Cancer Prediction' %}
+<div class="card danger-zone" style="margin-bottom: 2rem; padding: 1.5rem; display: block;">
+    <div class="danger-zone-title"><i class="fa-solid fa-triangle-exclamation"></i> For Medical Professionals Only</div>
+    <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.5rem; line-height: 1.5;">This model requires precise cytology metrics derived from digitized images of a Fine Needle Aspirate (FNA) of a breast mass. If you are a patient without a comprehensive pathology report, the default baseline values used for missing inputs will render the prediction inaccurate.</p>
+</div>
+{% endif %}
+
+<div class="card" style="margin-bottom: 2rem; animation: fadeIn 0.5s ease-out;">
+    
+    {% if result %}
+        {% include 'components/prediction_result.html' %}
+    {% endif %}
+
+    <form method="post" id="prediction-form" style="margin-top: 1rem;">
+        {% csrf_token %}
+        <div class="alert-info" style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: flex-start;">
+            <i class="fa-solid fa-circle-info" style="color: var(--primary); margin-top: 0.2rem;"></i>
+            <div>
+                <strong style="display: block; color: var(--text-main); margin-bottom: 0.25rem;">Quick Prediction Mode</strong>
+                <span style="color: var(--text-muted); font-size: 0.95rem;">You only need to fill out the basic information below. <strong>All fields are technically optional.</strong> If you don't have clinical lab reports, you can safely skip the advanced section.</span>
+            </div>
+        </div>
+
+        <div class="grid-3" style="gap: 1.5rem;">
+            {% for field in form %}
+                {% if forloop.counter <= 6 %}
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <small style="color: var(--danger); display: block; margin-top: 0.25rem;"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</small>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if form.fields|length > 6 %}
+        <div class="advanced-section" style="margin-top: 2rem;">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('advanced-fields').style.display='block'; this.style.display='none';" style="width: 100%; border: 1px dashed var(--border); background: rgba(255, 255, 255, 0.02);">
+                <i class="fa-solid fa-flask" style="margin-right: 0.5rem; color: var(--primary);"></i> Add Clinical / Lab Data (Optional)
+            </button>
+            
+            <div id="advanced-fields" style="display: none; margin-top: 1.5rem; padding: 1.5rem; border: 1px dashed var(--border); border-radius: var(--radius-md); background: rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; color: var(--text-main); font-size: 1.2rem;">Clinical & Medical History</h3>
+                <div class="grid-3" style="gap: 1.5rem;">
+                    {% for field in form %}
+                        {% if forloop.counter > 6 %}
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="{{ field.id_for_label }}">{{ field.label }} <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: normal;">(Optional)</span></label>
+                            {{ field }}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div style="margin-top: 3rem; text-align: center; border-top: 1px solid var(--border); padding-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem; border-radius: 9999px;">
+                <i class="fa-solid fa-microchip" style="margin-right: 0.5rem;"></i> Analyze Health Data
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Add form-control class to all inputs
+    document.querySelectorAll('input, select, textarea').forEach(function(el) {
+        if(el.type !== 'checkbox' && el.type !== 'radio') {
+            el.classList.add('form-control');
+        }
+    });
+
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+<div style="background-color: {% if result.prediction == 1 or result.label == 'Malignant' or result.prediction == 0 and result.label != 'Low Risk' and result.label != 'Benign' %}rgba(239, 68, 68, 0.15){% else %}rgba(16, 185, 129, 0.15){% endif %}; 
+            border-radius: var(--radius-lg); 
+            padding: 2.5rem; 
+            text-align: center; 
+            border: 1px solid {% if result.prediction == 1 or result.label == 'Malignant' or result.prediction == 0 and result.label != 'Low Risk' and result.label != 'Benign' %}rgba(239, 68, 68, 0.5){% else %}rgba(16, 185, 129, 0.5){% endif %};
+            margin-bottom: 3rem;
+            animation: slideInDown 0.5s ease-out;
+            box-shadow: var(--shadow-sm);">
+    
+    <div style="font-size: 3rem; margin-bottom: 1rem; color: {% if result.prediction == 1 or result.label == 'Malignant' or result.prediction == 0 and result.label != 'Low Risk' and result.label != 'Benign' %}#EF4444{% else %}#10B981{% endif %};">
+        {% if result.prediction == 1 or result.label == 'Malignant' or result.prediction == 0 and result.label != 'Low Risk' and result.label != 'Benign' %}
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        {% else %}
+            <i class="fa-solid fa-circle-check"></i>
+        {% endif %}
+    </div>
+
+    <h3 style="margin-top: 0; color: {% if result.prediction == 1 or result.label == 'Malignant' or result.prediction == 0 and result.label != 'Low Risk' and result.label != 'Benign' %}#991B1B{% else %}#065F46{% endif %}; font-size: 1.75rem; font-weight: 700;">
+        Model Prediction: {{ result.label }}
+    </h3>
+    
+    <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem;">
+        <span style="font-size: 1.1rem; color: var(--text-muted); font-weight: 500;">Confidence Score:</span>
+        <div style="width: 200px; height: 10px; background-color: rgba(0,0,0,0.05); border-radius: 5px; overflow: hidden;">
+            <div style="height: 100%; width: {% widthratio result.probability 1 100 %}%; background-color: {% if result.prediction == 1 or result.label == 'Malignant' or result.prediction == 0 and result.label != 'Low Risk' and result.label != 'Benign' %}#EF4444{% else %}#10B981{% endif %}; border-radius: 5px;"></div>
+        </div>
+        <span style="font-size: 1.1rem; font-weight: 700;">{{ result.probability|floatformat:2 }}</span>
+    </div>
+
+    <p style="font-size: 0.9em; color: var(--text-muted); margin-top: 2rem; margin-bottom: 0;">
+        <i class="fa-solid fa-lock" style="margin-right: 0.25rem;"></i> This result has been securely saved to your patient history.
+    </p>
+</div>
