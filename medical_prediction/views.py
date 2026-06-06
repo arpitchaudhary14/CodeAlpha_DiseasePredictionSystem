@@ -141,10 +141,9 @@ def register_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, 'Registration successful. Welcome to MediSense!')
-            return redirect('dashboard')
+            form.save()
+            messages.success(request, 'Account created successfully! Please log in to continue.')
+            return redirect('login')
         else:
             messages.error(request, 'Registration failed. Please correct the errors below.')
     else:

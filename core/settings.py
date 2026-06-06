@@ -155,8 +155,8 @@ PASSWORD_RESET_TIMEOUT = 120  # 2 minutes
 
 # --- Email / SMTP Configuration ---
 # Uses Google Apps Script Webhook (HTTPS) to bypass Render's SMTP port block.
-# Falls back to standard Django SMTP if GMAIL_WEBHOOK_URL is not set.
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# This custom backend handles ALL Django emails including built-in password reset.
+EMAIL_BACKEND = 'medical_prediction.email_backend.WebhookEmailBackend'
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = True

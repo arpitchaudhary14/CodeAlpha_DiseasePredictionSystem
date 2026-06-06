@@ -1,6 +1,8 @@
 # MediSense AI 🏥🤖
 
-MediSense is an advanced, production-ready, AI-powered healthcare diagnostics platform. It provides sophisticated machine learning predictions for major diseases (Diabetes, Liver Disease, Breast Cancer, Heart Disease, Parkinson's) and integrates Google Gemini AI for symptom analysis, medical document processing, and an interactive health assistant.
+**[🌐 Live Demo — Try it here!](https://medisense-ai-9mnr.onrender.com/)**
+
+MediSense is an advanced, production-ready, AI-powered healthcare diagnostics platform. It provides sophisticated machine learning predictions for major diseases (Diabetes, Liver Disease, Breast Cancer, Heart Disease, Kidney Disease) and integrates Google Gemini AI for symptom analysis, medical document processing, and an interactive health assistant.
 
 ## ✨ Key Features
 
@@ -25,17 +27,18 @@ MediSense is an advanced, production-ready, AI-powered healthcare diagnostics pl
 
 ## 🛠️ Technology Stack
 - **Backend:** Django 5, Python 3
-- **Machine Learning:** Scikit-Learn, Pandas, Joblib
+- **Machine Learning:** Scikit-Learn, XGBoost, Pandas, Joblib
 - **Generative AI:** Google Generative AI SDK (`google-generativeai`)
 - **Frontend:** HTML5, CSS3 (Custom Responsive Design), Vanilla JavaScript
-- **Database:** SQLite (Development) / PostgreSQL-ready
+- **Database:** SQLite (Development) / PostgreSQL (Production via Supabase)
+- **Deployment:** Render (Web Service + PostgreSQL)
 
 ## 🚀 Local Setup Instructions
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/MediSense.git
-cd MediSense
+git clone https://github.com/arpitchaudhary14/CodeAlpha_DiseasePredictionSystem.git
+cd CodeAlpha_DiseasePredictionSystem
 ```
 
 ### 2. Create a Virtual Environment
@@ -59,8 +62,11 @@ cp .env.example .env
 ```
 Fill in the following variables in your `.env` file:
 - `SECRET_KEY`: Your Django secret key.
-- `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD`: Your SMTP email credentials.
+- `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD`: Your Gmail credentials (App Password).
 - `GEMINI_API_KEY`: Your Google AI Studio API key (Required for AI features).
+- `GMAIL_WEBHOOK_URL`: Google Apps Script Webhook URL (Required for emails on Render — see Deployment Note below).
+
+> **Deployment Note:** Platforms like Render block SMTP ports on free tier. For emails to work in production, create a Google Apps Script Web App and add its URL as `GMAIL_WEBHOOK_URL` in your environment variables.
 
 ### 5. Run Migrations & Start Server
 ```bash
@@ -76,4 +82,4 @@ Open your browser and navigate to `http://127.0.0.1:8000/`.
 **MediSense is designed for educational, informational, and preliminary analytical purposes only.** The AI predictions and models do not constitute professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
 
 ---
-© 2026 MediSense AI. Powered by ResoNate.
+© 2026 MediSense AI. Powered by ResoNate. A [CodeAlpha](https://www.codealpha.tech) Internship Project.

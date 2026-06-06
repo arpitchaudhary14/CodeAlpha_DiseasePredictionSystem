@@ -39,6 +39,16 @@
     <div class="card" style="margin-bottom: 0;">
         <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.2rem;">Security Settings</h3>
         
+        <!-- Email Verification -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem;">
+            <div>
+                <h4 style="margin: 0 0 0.3rem 0; font-size: 1rem;">Email Verification</h4>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Verify your email address: <strong>{{ user.email }}</strong></p>
+            </div>
+            <a href="{% url 'password_reset' %}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem; text-decoration: none; white-space: nowrap;">Verify Email</a>
+        </div>
+
+        <!-- 2FA -->
         <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem;">
             <div>
                 <h4 style="margin: 0 0 0.3rem 0; font-size: 1rem;">Two-Factor Authentication (2FA)</h4>
