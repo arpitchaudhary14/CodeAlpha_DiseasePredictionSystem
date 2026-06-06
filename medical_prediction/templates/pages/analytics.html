@@ -1,0 +1,496 @@
+{% extends 'base.html' %}
+
+{% block title %}Health Analytics - MediSense{% endblock %}
+
+{% block content %}
+<style>
+    .analytics-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .score-ring-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .score-ring {
+        width: 140px;
+        height: 140px;
+        transform: rotate(-90deg);
+    }
+
+    .score-ring circle {
+        fill: none;
+        stroke-width: 10;
+        stroke-linecap: round;
+    }
+
+    .score-ring .bg-ring {
+        stroke: rgba(255, 255, 255, 0.08);
+    }
+
+    .score-ring .progress-ring {
+        stroke: url(#scoreGradient);
+        stroke-dasharray: 377;
+        transition: stroke-dashoffset 1.2s ease;
+    }
+
+    .score-text {
+        position: absolute;
+        text-align: center;
+    }
+
+    .score-text .score-number {
+        font-size: 2.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #7c3aed, #06b6d4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+    }
+
+    .score-text .score-label {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.25rem;
+    }
+
+    .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(124, 58, 237, 0.15);
+    }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .stat-icon.danger { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    .stat-icon.success { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .stat-icon.purple { background: rgba(124, 58, 237, 0.15); color: #a78bfa; }
+
+    .stat-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text-main);
+        line-height: 1.2;
+    }
+
+    .stat-desc {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.2rem;
+    }
+
+    .chart-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.75rem;
+    }
+
+    .chart-card h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0 0 1.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .trend-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        margin-bottom: 0.75rem;
+        transition: background 0.2s;
+    }
+
+    .trend-item:hover {
+        background: rgba(124, 58, 237, 0.06);
+    }
+
+    .trend-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1rem;
+    }
+
+    .trend-icon.up { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    .trend-icon.down { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+
+    .trend-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-main);
+    }
+
+    .trend-meta {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.2rem;
+    }
+
+    .analytics-grid-top {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        align-items: stretch;
+    }
+
+    .stats-col {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .line-chart-full {
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 900px) {
+        .analytics-grid-top {
+            grid-template-columns: 1fr;
+        }
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+        .score-ring-wrapper {
+            margin: 0 auto;
+        }
+    }
+</style>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<div class="analytics-header">
+    <div>
+        <h1 style="margin: 0; font-size: 2rem; letter-spacing: -0.02em;">
+            <i class="fa-solid fa-chart-line" style="color: var(--primary); margin-right: 0.5rem;"></i>
+            Health <span class="text-gradient">Analytics</span>
+        </h1>
+        <p style="color: var(--text-muted); margin: 0.4rem 0 0;">Your personalized health risk overview based on all predictions.</p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+        <i class="fa-solid fa-arrow-left" style="margin-right: 0.5rem;"></i> Back to Dashboard
+    </a>
+</div>
+
+<!-- Top Section: Score + Stats -->
+<div class="analytics-grid-top">
+    <!-- Health Score Ring -->
+    <div class="chart-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2.5rem 2rem; min-width: 200px;">
+        <div class="score-ring-wrapper">
+            <svg class="score-ring" viewBox="0 0 140 140">
+                <defs>
+                    <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle class="bg-ring" cx="70" cy="70" r="60"/>
+                <circle class="progress-ring" cx="70" cy="70" r="60"
+                    stroke-dashoffset="{{ health_score_offset }}"
+                    id="scoreCircle"/>
+            </svg>
+            <div class="score-text">
+                <div class="score-number" id="scoreNumber">{{ health_score }}</div>
+                <div class="score-label">Health Score</div>
+            </div>
+        </div>
+        <p style="font-size:0.82rem; color: var(--text-muted); margin-top: 1rem; text-align: center;">
+            {% if health_score >= 80 %}
+                <span style="color: #34d399;"><i class="fa-solid fa-circle-check"></i> Excellent health profile!</span>
+            {% elif health_score >= 60 %}
+                <span style="color: #fbbf24;"><i class="fa-solid fa-circle-exclamation"></i> Moderate risk detected.</span>
+            {% else %}
+                <span style="color: #f87171;"><i class="fa-solid fa-triangle-exclamation"></i> High risk — consult a doctor.</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stats-col">
+        <div class="stat-card">
+            <div class="stat-icon danger">
+                <i class="fa-solid fa-arrow-trend-up"></i>
+            </div>
+            <div>
+                <div class="stat-value">{{ highest_disease }}</div>
+                <div class="stat-desc">Highest Risk — <strong>{{ highest_risk_val|floatformat:1 }}%</strong> probability</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fa-solid fa-arrow-trend-down"></i>
+            </div>
+            <div>
+                <div class="stat-value">{{ lowest_disease }}</div>
+                <div class="stat-desc">Lowest Risk — <strong>{{ lowest_risk_val|floatformat:1 }}%</strong> probability</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon purple">
+                <i class="fa-solid fa-shield-heart"></i>
+            </div>
+            <div>
+                <div class="stat-value">{{ health_score }}/100</div>
+                <div class="stat-desc">Overall Health Score (higher is better)</div>
+            </div>
+        </div>
+
+        {% if trends %}
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(6,182,212,0.15); color: #22d3ee;">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+            <div>
+                <div class="stat-value">{{ trends|length }} Alert{{ trends|length|pluralize }}</div>
+                <div class="stat-desc">Significant risk changes detected across predictions</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Charts: Radar + Trends -->
+<div class="charts-grid">
+    <!-- Radar Chart -->
+    <div class="chart-card">
+        <h2>
+            <i class="fa-solid fa-spider" style="color: #a78bfa;"></i>
+            Risk Radar
+        </h2>
+        <canvas id="radarChart" height="280"></canvas>
+    </div>
+
+    <!-- Trends Timeline -->
+    <div class="chart-card">
+        <h2>
+            <i class="fa-solid fa-bell-ring" style="color: #fbbf24;"></i>
+            Recent Trend Alerts
+        </h2>
+        {% if trends %}
+            {% for t in trends %}
+            <div class="trend-item">
+                <div class="trend-icon {% if t.status == 'worsened' %}up{% else %}down{% endif %}">
+                    <i class="fa-solid fa-arrow-{% if t.status == 'worsened' %}up{% else %}down{% endif %}"></i>
+                </div>
+                <div>
+                    <div class="trend-title">{{ t.message }}</div>
+                    <div class="trend-meta">
+                        <i class="fa-regular fa-calendar" style="margin-right: 4px;"></i>
+                        {{ t.date|date:"M d, Y" }}
+                        &nbsp;|&nbsp;
+                        <span style="color: {% if t.status == 'worsened' %}#f87171{% else %}#34d399{% endif %};">
+                            {% if t.delta > 0 %}+{% endif %}{{ t.delta|floatformat:1 }}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <i class="fa-solid fa-check-circle" style="font-size: 2rem; color: #34d399; margin-bottom: 1rem; display: block;"></i>
+                No significant changes detected yet. Keep logging predictions!
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Line Chart: Risk Timeline -->
+<div class="chart-card line-chart-full">
+    <h2>
+        <i class="fa-solid fa-chart-line" style="color: #06b6d4;"></i>
+        Risk Progression Over Time
+    </h2>
+    <canvas id="lineChart" height="120"></canvas>
+</div>
+
+<script>
+    // ── Data from Django ──────────────────────────────────────────
+    const radarLabels  = {{ radar_labels|safe }};
+    const radarData    = {{ radar_data|safe }};
+    const lineLabels   = {{ line_labels|safe }};
+    const lineDatasets = {{ line_datasets|safe }};
+    const healthScore  = {{ health_score }};
+
+    // ── Animate Score Ring ────────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', () => {
+        const circumference = 2 * Math.PI * 60; // ≈ 377
+        const offset = circumference - (healthScore / 100) * circumference;
+        const circle = document.getElementById('scoreCircle');
+        if (circle) {
+            circle.style.strokeDasharray = circumference;
+            circle.style.strokeDashoffset = circumference; // start at 0
+            requestAnimationFrame(() => {
+                circle.style.transition = 'stroke-dashoffset 1.3s cubic-bezier(0.4,0,0.2,1)';
+                circle.style.strokeDashoffset = offset;
+            });
+        }
+    });
+
+    // ── Color Palette ─────────────────────────────────────────────
+    const palette = [
+        { border: 'rgba(124, 58, 237, 1)',  bg: 'rgba(124, 58, 237, 0.15)' },
+        { border: 'rgba(6, 182, 212, 1)',   bg: 'rgba(6, 182, 212, 0.15)' },
+        { border: 'rgba(251, 191, 36, 1)',  bg: 'rgba(251, 191, 36, 0.15)' },
+        { border: 'rgba(239, 68, 68, 1)',   bg: 'rgba(239, 68, 68, 0.15)' },
+        { border: 'rgba(16, 185, 129, 1)',  bg: 'rgba(16, 185, 129, 0.15)' },
+    ];
+
+    // ── Chart Defaults ────────────────────────────────────────────
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = "'Inter', 'Outfit', sans-serif";
+
+    // ── Radar Chart ───────────────────────────────────────────────
+    const radarCtx = document.getElementById('radarChart').getContext('2d');
+    new Chart(radarCtx, {
+        type: 'radar',
+        data: {
+            labels: radarLabels,
+            datasets: [{
+                label: 'Risk (%)',
+                data: radarData,
+                borderColor: 'rgba(124, 58, 237, 1)',
+                backgroundColor: 'rgba(124, 58, 237, 0.2)',
+                pointBackgroundColor: 'rgba(124, 58, 237, 1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(124, 58, 237, 1)',
+                borderWidth: 2,
+                pointRadius: 5,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                r: {
+                    min: 0,
+                    max: 100,
+                    ticks: {
+                        stepSize: 25,
+                        color: '#64748b',
+                        backdropColor: 'transparent',
+                        font: { size: 10 }
+                    },
+                    grid: { color: 'rgba(255,255,255,0.07)' },
+                    angleLines: { color: 'rgba(255,255,255,0.07)' },
+                    pointLabels: { color: '#94a3b8', font: { size: 12, weight: '600' } }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.raw.toFixed(1)}% risk`
+                    }
+                }
+            }
+        }
+    });
+
+    // ── Line Chart ────────────────────────────────────────────────
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    const diseaseNames = { diabetes: 'Diabetes', heart: 'Heart Disease', kidney: 'Kidney Disease', liver: 'Liver Disease', breast_cancer: 'Breast Cancer' };
+
+    const lineDatasetArr = Object.entries(lineDatasets).map(([key, data], i) => {
+        const c = palette[i % palette.length];
+        return {
+            label: diseaseNames[key] || key,
+            data: data,
+            borderColor: c.border,
+            backgroundColor: c.bg,
+            borderWidth: 2.5,
+            pointRadius: 4,
+            pointHoverRadius: 7,
+            tension: 0.35,
+            fill: false,
+        };
+    });
+
+    new Chart(lineCtx, {
+        type: 'line',
+        data: { labels: lineLabels, datasets: lineDatasetArr },
+        options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#64748b' }
+                },
+                y: {
+                    min: 0,
+                    max: 100,
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: {
+                        color: '#64748b',
+                        callback: v => v + '%'
+                    },
+                    title: { display: true, text: 'Risk (%)', color: '#64748b' }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 20, boxWidth: 12, color: '#94a3b8' }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.dataset.label}: ${ctx.raw.toFixed(1)}%`
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
