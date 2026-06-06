@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
+import os, json, urllib.request
 from django.core.cache import cache
 from django.contrib.auth import views as auth_views
 from functools import wraps
@@ -24,6 +25,29 @@ from .ml.assistant import ask_health_assistant
 from .ml.feature_meta import get_feature_meta
 import markdown
 
+
+def send_custom_email(subject, body, recipient_list, html_message=None):
+    """
+    Sends email via Google Apps Script Webhook (HTTPS) to bypass Render SMTP blocks.
+    Falls back to Django's standard send_mail if webhook URL is not configured.
+    """
+    webhook_url = getattr(settings, 'GMAIL_WEBHOOK_URL', '') or os.getenv('GMAIL_WEBHOOK_URL', '')
+
+    if webhook_url:
+        data = {
+            'to': recipient_list[0],
+            'subject': subject,
+            'htmlBody': html_message if html_message else body.replace('\n', '<br>')
+        }
+        req = urllib.request.Request(
+            webhook_url,
+            data=json.dumps(data).encode('utf-8'),
+            headers={'Content-Type': 'application/json'}
+        )
+        urllib.request.urlopen(req, timeout=10)
+    else:
+        send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipient_list, fail_silently=False, html_message=html_message)
+
 # --- Public Views ---
 def landing_view(request):
     return render(request, 'pages/landing.html')
@@ -38,12 +62,10 @@ def contact_view(request):
         body = f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}"
         
         try:
-            send_mail(
+            send_custom_email(
                 subject,
                 body,
-                settings.DEFAULT_FROM_EMAIL,
-                [settings.EMAIL_HOST_USER], # Send to the admin inbox
-                fail_silently=False,
+                [settings.EMAIL_HOST_USER]
             )
             messages.success(request, 'Thank you! Your message has been sent. We will get back to you shortly.')
         except Exception as e:

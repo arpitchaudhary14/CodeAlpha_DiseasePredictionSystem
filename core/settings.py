@@ -28,7 +28,7 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-rknf)n8$(15kg@0*gu85(6&v-0m_l0ttb7y9=xgq1-n7v$3tr9')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 't')
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
 
 ALLOWED_HOSTS = ['*'] # Allow all hosts for easy cloud deployment (Render, Railway, etc.)
 
@@ -80,14 +80,30 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+# Uses PostgreSQL on production (Render/Supabase) via DATABASE_URL env variable.
+# Falls back to SQLite for local development.
+DATABASE_URL = os.getenv('DATABASE_URL')
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DATABASE_URL:
+    import urllib.parse
+    parsed = urllib.parse.urlparse(DATABASE_URL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': parsed.path[1:],
+            'USER': parsed.username,
+            'PASSWORD': parsed.password,
+            'HOST': parsed.hostname,
+            'PORT': parsed.port,
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -137,13 +153,17 @@ LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 PASSWORD_RESET_TIMEOUT = 120  # 2 minutes
 
-# --- Email / SMTP Configuration (ResoNate SMTP) ---
+# --- Email / SMTP Configuration ---
+# Uses Google Apps Script Webhook (HTTPS) to bypass Render's SMTP port block.
+# Falls back to standard Django SMTP if GMAIL_WEBHOOK_URL is not set.
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = True
+EMAIL_TIMEOUT = 5
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'test@example.com')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'password')
+GMAIL_WEBHOOK_URL = os.getenv('GMAIL_WEBHOOK_URL', '')
 DEFAULT_FROM_EMAIL = f"MediSense via ResoNate <{EMAIL_HOST_USER}>"
 
 # --- Media Files (For Avatars) ---
