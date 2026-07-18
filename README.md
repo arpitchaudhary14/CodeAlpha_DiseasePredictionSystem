@@ -1,189 +1,85 @@
-# 🏥 MediSense AI - Intelligent Healthcare Diagnostics
+# MediSense AI 🏥🤖
 
-MediSense AI is a full-stack, AI-powered healthcare platform that combines machine learning models with Google's Gemini AI to provide intelligent disease risk prediction, symptom analysis, medical document interpretation, and an interactive health assistant.
+**[🌐 Live Demo — Try it here!](https://medisense-ai-9mnr.onrender.com/)**
 
-Designed with security, usability, and scalability in mind, the platform offers a seamless experience for both patients and healthcare enthusiasts while showcasing modern AI integration in web applications.
+MediSense is an advanced, production-ready, AI-powered healthcare diagnostics platform. It provides sophisticated machine learning predictions for major diseases (Diabetes, Liver Disease, Breast Cancer, Heart Disease, Kidney Disease) and integrates Google Gemini AI for symptom analysis, medical document processing, and an interactive health assistant.
 
----
+## ✨ Key Features
 
-# ✨ Features
+### 🔬 Machine Learning Diagnostics
+- Pre-trained robust scikit-learn/XGBoost models integrated via `joblib`.
+- Predicts disease risk based on clinical and laboratory input data.
+- Handles missing data gracefully by injecting baseline medical averages to avoid input errors.
+- Clean, non-technical UI tailored for both patients and medical professionals.
 
-## 🔬 AI-Powered Disease Prediction
+### 🧠 Gemini AI Integration
+- **Health Assistant:** Conversational AI capable of answering health-related queries using Google's `gemini-2.5-flash` model.
+- **Symptom Analyzer:** Analyzes a list of user-provided symptoms to suggest possible medical conditions with structured reasoning.
+- **Document & Prescription AI:** Analyzes uploaded medical PDFs, X-Rays, or prescriptions to summarize complex medical jargon into easy-to-understand insights.
+- **Rate Limited:** Highly secure custom rate-limiting (`@gemini_rate_limit`) to prevent API abuse (5 requests / 30 minutes).
 
-- Predicts the likelihood of multiple diseases using trained Machine Learning models.
-- Supports prediction for:
-  - Diabetes
-  - Heart Disease
-  - Breast Cancer
-  - Kidney Disease
-  - Liver Disease
-- Built using pre-trained **Scikit-Learn** and **XGBoost** models.
-- Automatically handles missing clinical values using medically appropriate baseline averages.
-- Simple, intuitive interface for quick and accurate predictions.
+### 🔒 Enterprise-Grade Security & Authentication
+- Secure registration and login flow.
+- Configured with strict 2-minute (`PASSWORD_RESET_TIMEOUT = 120`) email password reset tokens.
+- Custom rate-limited password reset endpoint (max 3 requests / 30 minutes) to prevent email spam.
+- Fully configured SMTP email integration for transactional emails.
+- Auto-logout AFK session timeouts.
 
----
+## 🛠️ Technology Stack
+- **Backend:** Django 5, Python 3
+- **Machine Learning:** Scikit-Learn, XGBoost, Pandas, Joblib
+- **Generative AI:** Google Generative AI SDK (`google-generativeai`)
+- **Frontend:** HTML5, CSS3 (Custom Responsive Design), Vanilla JavaScript
+- **Database:** SQLite (Development) / PostgreSQL (Production via Supabase)
+- **Deployment:** Render (Web Service + PostgreSQL)
 
-## 🤖 Gemini AI Integration
+## 🚀 Local Setup Instructions
 
-### 💬 AI Health Assistant
-- Conversational healthcare chatbot powered by **Google Gemini 2.5 Flash**.
-- Answers general health-related questions in natural language.
-
-### 🩺 Symptom Analyzer
-- Analyzes user-provided symptoms.
-- Suggests possible medical conditions with structured AI-generated explanations.
-
-### 📄 Medical Document Analyzer
-- Upload medical reports, prescriptions, or laboratory PDFs.
-- AI summarizes complex medical terminology into easy-to-understand insights.
-
-### ⚡ Secure API Usage
-- Custom rate limiting protects Gemini API endpoints from excessive requests.
-- Maximum **5 AI requests every 30 minutes** per user.
-
----
-
-# 🔐 Security Features
-
-- Secure user registration and authentication
-- Email-based password reset
-- Short-lived password reset tokens
-- Rate-limited password reset requests
-- Automatic inactive session logout
-- Secure SMTP/Webhook email integration
-
----
-
-# 🛠 Technology Stack
-
-| Category | Technologies |
-|----------|--------------|
-| **Backend** | Django 5, Python 3 |
-| **Machine Learning** | Scikit-Learn, XGBoost, Pandas, Joblib |
-| **Generative AI** | Google Gemini API (`gemini-2.5-flash`) |
-| **Frontend** | HTML5, CSS3, Vanilla JavaScript |
-| **Database** | SQLite (Development), PostgreSQL via Supabase |
-| **Deployment** | Render |
-
----
-
-# 🚀 Local Installation
-
-## 1. Clone the Repository
-
+### 1. Clone the Repository
 ```bash
-git clone <repository_url>
+git clone https://github.com/arpitchaudhary14/CodeAlpha_DiseasePredictionSystem.git
 cd CodeAlpha_DiseasePredictionSystem
 ```
 
----
-
-## 2. Create a Virtual Environment
-
-### Windows
-
+### 2. Create a Virtual Environment
 ```bash
 python -m venv venv
+# On Windows
 venv\Scripts\activate
-```
-
-### Linux / macOS
-
-```bash
-python -m venv venv
+# On macOS/Linux
 source venv/bin/activate
 ```
 
----
-
-## 3. Install Dependencies
-
+### 3. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
----
-
-## 4. Configure Environment Variables
-
-Create a `.env` file in the project root.
-
-```env
-SECRET_KEY=your_django_secret_key
-
-EMAIL_HOST_USER=your_email@gmail.com
-
-EMAIL_HOST_PASSWORD=your_16_digit_app_password
-
-GEMINI_API_KEY=your_google_ai_studio_api_key
-
-GMAIL_WEBHOOK_URL=your_google_apps_script_webhook_url
+### 4. Configure Environment Variables
+Copy the `.env.example` file and create a new `.env` file in the root directory.
+```bash
+cp .env.example .env
 ```
+Fill in the following variables in your `.env` file:
+- `SECRET_KEY`: Your Django secret key.
+- `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD`: Your Gmail credentials (App Password).
+- `GEMINI_API_KEY`: Your Google AI Studio API key (Required for AI features).
+- `GMAIL_WEBHOOK_URL`: Google Apps Script Webhook URL (Required for emails on Render — see Deployment Note below).
 
-> **Deployment Note**
->
-> Free hosting platforms such as Render restrict SMTP access. To enable email functionality in production, configure a Google Apps Script Webhook and provide its URL using `GMAIL_WEBHOOK_URL`.
+> **Deployment Note:** Platforms like Render block SMTP ports on free tier. For emails to work in production, create a Google Apps Script Web App and add its URL as `GMAIL_WEBHOOK_URL` in your environment variables.
 
----
-
-## 5. Apply Database Migrations
-
+### 5. Run Migrations & Start Server
 ```bash
 python manage.py makemigrations
 python manage.py migrate
-```
-
----
-
-## 6. Run the Development Server
-
-```bash
 python manage.py runserver
 ```
 
-Visit:
+### 6. Access the Application
+Open your browser and navigate to `http://127.0.0.1:8000/`.
 
-```
-http://127.0.0.1:8000/
-```
-
----
-
-# 🧠 Machine Learning Models
-
-The application uses multiple pre-trained Machine Learning models for disease prediction.
-
-- Diabetes Prediction
-- Heart Disease Prediction
-- Breast Cancer Prediction
-- Kidney Disease Prediction
-- Liver Disease Prediction
-
-All models are serialized using **Joblib** for fast inference and production deployment.
+## ⚠️ Disclaimer
+**MediSense is designed for educational, informational, and preliminary analytical purposes only.** The AI predictions and models do not constitute professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
 
 ---
-
-# 📌 Future Improvements
-
-- Medical history tracking
-- Personalized health recommendations
-- Doctor appointment integration
-- Multi-language AI support
-- PDF report generation
-- REST API for third-party healthcare applications
-
----
-
-# ⚠️ Disclaimer
-
-**MediSense AI is intended for educational and demonstration purposes only.**
-
-The predictions, AI-generated analyses, and recommendations provided by this application should **not** be considered professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare professional before making medical decisions.
-
----
-
-# 📄 License
-
-© 2026 **MediSense AI**. All Rights Reserved.
-
-Developed as a **CodeAlpha Internship Project**.
+© 2026 MediSense AI. Powered by ResoNate. A [CodeAlpha](https://www.codealpha.tech) Internship Project.
